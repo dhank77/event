@@ -136,56 +136,16 @@ const EVENTS = [
     },
 ];
 
-const PRICING = [
-    {
-        name: 'Gratis',
-        price: 'Rp 0',
-        period: 'selamanya',
-        description: 'Untuk event kecil dan personal',
-        features: ['Hingga 100 peserta', '1 event aktif', 'QR Check-in', 'E-Ticket dasar', 'Laporan sederhana'],
-        cta: 'Mulai Gratis',
-        variant: 'outline' as const,
-        popular: false,
-        bgColor: 'bg-card',
-    },
-    {
-        name: 'Pro',
-        price: 'Rp 299.000',
-        period: '/bulan',
-        description: 'Untuk organizer profesional',
-        features: [
-            'Peserta unlimited',
-            'Event unlimited',
-            'QR Check-in',
-            'E-Certificate',
-            'Dashboard analitik lengkap',
-            'Custom branding',
-            'Priority support',
-        ],
-        cta: 'Coba Pro',
-        variant: 'default' as const,
-        popular: true,
-        bgColor: 'bg-secondary',
-    },
-    {
-        name: 'Enterprise',
-        price: 'Custom',
-        period: '',
-        description: 'Untuk perusahaan & organisasi besar',
-        features: [
-            'Semua fitur Pro',
-            'SSO & team management',
-            'API access',
-            'Dedicated account manager',
-            'SLA 99.99%',
-            'White-label solution',
-            'On-premise deployment',
-        ],
-        cta: 'Hubungi Sales',
-        variant: 'outline' as const,
-        popular: false,
-        bgColor: 'bg-card',
-    },
+const PRICING_FEATURES = [
+    'Peserta unlimited',
+    'Event unlimited',
+    'QR Check-in',
+    'E-Certificate otomatis',
+    'Dashboard analitik lengkap',
+    'Integrasi pembayaran',
+    'Custom branding',
+    'Laporan & export data',
+    'Priority support 24/7',
 ];
 
 const TESTIMONIALS = [
@@ -607,54 +567,80 @@ export default function Welcome() {
                                 Harga
                             </Badge>
                             <h2 className="font-mono text-3xl font-black tracking-tight sm:text-4xl">
-                                Pilih Paket yang Tepat
+                                Gratis Dipakai, Bayar Saat Untung
                             </h2>
                             <p className="mt-4 text-lg text-muted-foreground">
-                                Mulai gratis, upgrade kapan saja. Tanpa biaya tersembunyi.
+                                Semua fitur bisa kamu gunakan secara gratis. Kami hanya mengenakan biaya admin
+                                <span className="font-bold text-foreground"> 3% </span>
+                                dari setiap transaksi tiket berbayar.
                             </p>
                         </div>
 
-                        <div className="grid gap-6 md:grid-cols-3">
-                            {PRICING.map((plan) => (
-                                <Card
-                                    key={plan.name}
-                                    className={`neo-lift relative border-2 border-foreground ${plan.bgColor} shadow-md ${plan.popular ? 'scale-[1.02] lg:scale-105' : ''}`}
-                                >
-                                    {plan.popular && (
-                                        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 border-2 border-foreground px-4 font-mono text-xs uppercase">
-                                            Paling Populer
-                                        </Badge>
-                                    )}
-                                    <CardHeader className="pt-8">
-                                        <CardTitle className="font-mono text-xl">{plan.name}</CardTitle>
-                                        <CardDescription>{plan.description}</CardDescription>
-                                        <div className="pt-2">
-                                            <span className="font-mono text-4xl font-black">{plan.price}</span>
-                                            {plan.period && (
-                                                <span className="ml-1 text-sm text-muted-foreground">{plan.period}</span>
-                                            )}
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <ul className="flex flex-col gap-3">
-                                            {plan.features.map((feature) => (
-                                                <li key={feature} className="flex items-start gap-2 text-sm">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-                                                    <span>{feature}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Button variant={plan.variant} className="w-full font-mono" size="lg" asChild>
-                                            <Link href={register()}>
-                                                {plan.cta}
-                                                <ChevronRight data-icon="inline-end" />
-                                            </Link>
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            ))}
+                        <div className="mx-auto max-w-2xl">
+                            <Card className="neo-lift border-2 border-foreground bg-secondary shadow-md">
+                                <CardHeader className="text-center">
+                                    <Badge variant="default" className="mx-auto mb-2 w-fit border-2 border-foreground px-4 font-mono text-xs uppercase">
+                                        Satu Paket Untuk Semua
+                                    </Badge>
+                                    <div className="flex items-baseline justify-center gap-2 pt-4">
+                                        <span className="font-mono text-6xl font-black">Rp 0</span>
+                                    </div>
+                                    <CardDescription className="text-base">
+                                        Gratis selamanya &mdash; tanpa langganan bulanan
+                                    </CardDescription>
+                                    <div className="mx-auto mt-4 flex w-fit items-center gap-2 border-2 border-foreground bg-background px-4 py-2 font-mono text-sm font-bold shadow-sm">
+                                        <CreditCard className="size-4 text-primary" />
+                                        Biaya admin hanya 3% per transaksi
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <Separator className="mb-6" />
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        {PRICING_FEATURES.map((feature) => (
+                                            <div key={feature} className="flex items-start gap-2 text-sm">
+                                                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                                                <span>{feature}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex flex-col gap-3">
+                                    <Button className="w-full font-mono" size="lg" asChild>
+                                        <Link href={register()}>
+                                            Mulai Sekarang — Gratis!
+                                            <ChevronRight data-icon="inline-end" />
+                                        </Link>
+                                    </Button>
+                                    <p className="text-center text-xs text-muted-foreground">
+                                        Tidak perlu kartu kredit &bull; Event gratis tanpa biaya apapun
+                                    </p>
+                                </CardFooter>
+                            </Card>
+                        </div>
+
+                        {/* Pricing explainer */}
+                        <div className="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-3">
+                            <div className="text-center">
+                                <div className="mx-auto mb-3 flex size-12 items-center justify-center border-2 border-foreground bg-background font-mono text-lg font-black shadow-sm">
+                                    0%
+                                </div>
+                                <p className="font-mono text-sm font-bold">Event Gratis</p>
+                                <p className="mt-1 text-xs text-muted-foreground">Tanpa biaya apapun untuk event yang tidak berbayar</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="mx-auto mb-3 flex size-12 items-center justify-center border-2 border-foreground bg-primary font-mono text-lg font-black text-primary-foreground shadow-sm">
+                                    3%
+                                </div>
+                                <p className="font-mono text-sm font-bold">Tiket Berbayar</p>
+                                <p className="mt-1 text-xs text-muted-foreground">Hanya 3% dari harga tiket sebagai biaya admin platform</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="mx-auto mb-3 flex size-12 items-center justify-center border-2 border-foreground bg-accent font-mono text-lg font-black text-accent-foreground shadow-sm">
+                                    ∞
+                                </div>
+                                <p className="font-mono text-sm font-bold">Tanpa Batas</p>
+                                <p className="mt-1 text-xs text-muted-foreground">Unlimited event, peserta, dan semua fitur premium</p>
+                            </div>
                         </div>
                     </div>
                 </section>
