@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\VendorProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -9,3 +10,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+// Vendor profile — must be last to avoid catching other routes
+Route::get('{user:username}', [VendorProfileController::class, 'show'])->name('vendor.show');
