@@ -17,7 +17,10 @@ trait ProfileValidationRules
     {
         return [
             'name' => $this->nameRules(),
+            'username' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($userId)],
             'email' => $this->emailRules($userId),
+            'avatar' => ['nullable', 'image', 'max:2048'], // Max 2MB image
+            'about' => ['nullable', 'string', 'max:1000'],
         ];
     }
 

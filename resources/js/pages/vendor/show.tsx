@@ -22,6 +22,8 @@ type VendorProps = {
         username: string;
         role: string;
         joined: string;
+        avatar: string | null;
+        about: string | null;
     };
 };
 
@@ -114,14 +116,22 @@ export default function VendorShow({ vendor }: VendorProps) {
                     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
                         <div className="relative -mt-16 flex flex-col gap-6 pb-8 sm:-mt-20 sm:flex-row sm:items-end sm:gap-8">
                             {/* Avatar */}
-                            <div className="flex size-28 shrink-0 items-center justify-center border-4 border-foreground bg-secondary font-mono text-4xl font-black shadow-md sm:size-36">
-                                {vendor.name
-                                    .split(' ')
-                                    .map((n) => n[0])
-                                    .join('')
-                                    .slice(0, 2)
-                                    .toUpperCase()}
-                            </div>
+                            {vendor.avatar ? (
+                                <img 
+                                    src={vendor.avatar} 
+                                    alt={vendor.name} 
+                                    className="size-28 shrink-0 object-cover border-4 border-foreground bg-secondary shadow-md sm:size-36"
+                                />
+                            ) : (
+                                <div className="flex size-28 shrink-0 items-center justify-center border-4 border-foreground bg-secondary font-mono text-4xl font-black shadow-md sm:size-36">
+                                    {vendor.name
+                                        .split(' ')
+                                        .map((n) => n[0])
+                                        .join('')
+                                        .slice(0, 2)
+                                        .toUpperCase()}
+                                </div>
+                            )}
 
                             {/* Info */}
                             <div className="flex flex-1 flex-col gap-2 sm:pb-2">
@@ -173,10 +183,8 @@ export default function VendorShow({ vendor }: VendorProps) {
                                 <CardTitle className="font-mono text-lg">Tentang</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-sm leading-relaxed text-muted-foreground">
-                                    Event organizer profesional yang berfokus pada event teknologi, workshop,
-                                    dan community meetup. Berpengalaman mengelola berbagai event dengan ribuan
-                                    peserta di seluruh Indonesia.
+                                <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                                    {vendor.about || 'Event organizer profesional yang berfokus pada event teknologi, workshop, dan community meetup.'}
                                 </p>
                             </CardContent>
                         </Card>
