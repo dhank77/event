@@ -19,6 +19,20 @@ import {
     Youtube,
 } from 'lucide-react';
 
+type EventItem = {
+    id: number;
+    title: string;
+    slug: string;
+    date: string;
+    location?: string;
+    attendees: string | number;
+    price?: string;
+    category: string;
+    banner: string | null;
+    bgColor: string;
+    status: 'upcoming' | 'past';
+};
+
 type VendorProps = {
     vendor: {
         name: string;
@@ -29,44 +43,9 @@ type VendorProps = {
         about: string | null;
         social_media: Record<string, string>;
     };
+    upcomingEvents: EventItem[];
+    pastEvents: EventItem[];
 };
-
-// Static event data for the vendor profile
-const VENDOR_EVENTS = [
-    {
-        id: 1,
-        title: 'Workshop UI/UX Design',
-        date: '20 Sep 2026',
-        location: 'Online via Zoom',
-        attendees: 150,
-        price: 'Rp 75.000',
-        category: 'Workshop',
-        bgColor: 'bg-secondary',
-        status: 'upcoming',
-    },
-    {
-        id: 2,
-        title: 'Community Meetup #12',
-        date: '5 Okt 2026',
-        location: 'Kopikenangan, Jakarta',
-        attendees: 45,
-        price: 'Gratis',
-        category: 'Meetup',
-        bgColor: 'bg-accent',
-        status: 'upcoming',
-    },
-    {
-        id: 3,
-        title: 'Seminar Digital Marketing',
-        date: '10 Agu 2026',
-        location: 'Auditorium UI, Depok',
-        attendees: 320,
-        price: 'Rp 50.000',
-        category: 'Seminar',
-        bgColor: 'bg-primary',
-        status: 'past',
-    },
-];
 
 const VENDOR_STATS = [
     { label: 'Event', value: '12' },
@@ -74,9 +53,7 @@ const VENDOR_STATS = [
     { label: 'Rating', value: '4.8' },
 ];
 
-export default function VendorShow({ vendor }: VendorProps) {
-    const upcomingEvents = VENDOR_EVENTS.filter((e) => e.status === 'upcoming');
-    const pastEvents = VENDOR_EVENTS.filter((e) => e.status === 'past');
+export default function VendorShow({ vendor, upcomingEvents, pastEvents }: VendorProps) {
 
     return (
         <>
@@ -249,9 +226,13 @@ export default function VendorShow({ vendor }: VendorProps) {
                                         key={event.id}
                                         className="neo-lift overflow-hidden border-2 border-foreground shadow-md"
                                     >
-                                        <div className={`relative h-36 ${event.bgColor} border-b-2 border-foreground`}>
+                                        <div className={`relative h-36 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
                                             <div className="absolute inset-0 flex items-center justify-center">
-                                                <CalendarDays className="size-12 opacity-20" />
+                                                {event.banner ? (
+                                                    <img src={event.banner} alt={event.title} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <CalendarDays className="size-12 opacity-20" />
+                                                )}
                                             </div>
                                             <Badge
                                                 variant="secondary"
@@ -321,9 +302,13 @@ export default function VendorShow({ vendor }: VendorProps) {
                                     key={event.id}
                                     className="neo-lift overflow-hidden border-2 border-foreground opacity-80 shadow-md"
                                 >
-                                    <div className={`relative h-28 ${event.bgColor} border-b-2 border-foreground`}>
+                                    <div className={`relative h-28 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <CalendarDays className="size-10 opacity-20" />
+                                            {event.banner ? (
+                                                <img src={event.banner} alt={event.title} className="w-full h-full object-cover grayscale opacity-60" />
+                                            ) : (
+                                                <CalendarDays className="size-10 opacity-20" />
+                                            )}
                                         </div>
                                         <Badge
                                             variant="secondary"
