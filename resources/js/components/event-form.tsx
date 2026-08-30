@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import { toast } from 'sonner';
 import {
     Calendar,
     Globe,
@@ -128,6 +129,26 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
         const options = {
             preserveScroll: true,
             forceFormData: true,
+            onError: (errs: Record<string, string>) => {
+                const errorKeys = Object.keys(errs);
+                if (errorKeys.length > 0) {
+                    toast.error('Gagal menyimpan. Silakan periksa kembali form Anda.');
+                    
+                    // Determine which step to go to based on first error
+                    const firstError = errorKeys[0];
+                    if (['title', 'description', 'category', 'type', 'banner'].includes(firstError)) {
+                        setCurrentStep(0);
+                    } else if (['location', 'maps_url', 'online_platform', 'online_url'].includes(firstError)) {
+                        setCurrentStep(1);
+                    } else if (firstError.startsWith('agendas') || firstError.startsWith('speakers')) {
+                        setCurrentStep(2);
+                    } else if (firstError.startsWith('sponsors')) {
+                        setCurrentStep(3);
+                    } else if (['starts_at', 'ends_at', 'max_attendees', 'status'].includes(firstError)) {
+                        setCurrentStep(4);
+                    }
+                }
+            }
         };
 
         if (method === 'post') post(action, options);
@@ -442,6 +463,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             value={agenda.time}
                                             onChange={(e) => updateAgenda(idx, 'time', e.target.value)}
                                         />
+                                        <InputError message={errors[`agendas.${idx}.time` as keyof typeof errors]} />
                                     </div>
                                     <div className="grid gap-1.5">
                                         <Label className="text-xs">Pembicara</Label>
@@ -450,6 +472,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             onChange={(e) => updateAgenda(idx, 'speaker', e.target.value)}
                                             placeholder="Nama pembicara"
                                         />
+                                        <InputError message={errors[`agendas.${idx}.speaker` as keyof typeof errors]} />
                                     </div>
                                 </div>
 
@@ -460,6 +483,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                         onChange={(e) => updateAgenda(idx, 'title', e.target.value)}
                                         placeholder="Judul materi atau kegiatan"
                                     />
+                                    <InputError message={errors[`agendas.${idx}.title` as keyof typeof errors]} />
                                 </div>
 
                                 <div className="grid gap-1.5">
@@ -470,6 +494,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                         placeholder="Detail tentang sesi ini..."
                                         minHeight="100px"
                                     />
+                                    <InputError message={errors[`agendas.${idx}.description` as keyof typeof errors]} />
                                 </div>
                             </div>
                         ))}
@@ -526,6 +551,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             onChange={(e) => updateSpeaker(idx, 'name', e.target.value)}
                                             placeholder="Nama lengkap"
                                         />
+                                        <InputError message={errors[`speakers.${idx}.name` as keyof typeof errors]} />
                                     </div>
                                     <div className="grid gap-1.5">
                                         <Label className="text-xs">Jabatan / Posisi</Label>
@@ -534,6 +560,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             onChange={(e) => updateSpeaker(idx, 'title', e.target.value)}
                                             placeholder="CEO, Developer, dll"
                                         />
+                                        <InputError message={errors[`speakers.${idx}.title` as keyof typeof errors]} />
                                     </div>
                                 </div>
 
@@ -544,6 +571,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                         onChange={(e) => updateSpeaker(idx, 'bio', e.target.value)}
                                         placeholder="Deskripsi singkat pembicara"
                                     />
+                                    <InputError message={errors[`speakers.${idx}.bio` as keyof typeof errors]} />
                                 </div>
 
                                 <div className="grid gap-1.5">
@@ -561,6 +589,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             }}
                                         />
                                     </label>
+                                    <InputError message={errors[`speakers.${idx}.avatar` as keyof typeof errors]} />
                                 </div>
                             </div>
                         ))}
@@ -620,6 +649,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                         onChange={(e) => updateSponsor(idx, 'name', e.target.value)}
                                         placeholder="Nama perusahaan"
                                     />
+                                    <InputError message={errors[`sponsors.${idx}.name` as keyof typeof errors]} />
                                 </div>
                                 <div className="grid gap-1.5">
                                     <Label className="text-xs">Tier</Label>
@@ -637,6 +667,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                             <SelectItem value="media">📰 Media Partner</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    <InputError message={errors[`sponsors.${idx}.tier` as keyof typeof errors]} />
                                 </div>
                             </div>
 
@@ -648,6 +679,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                     placeholder="https://sponsor.com"
                                     type="url"
                                 />
+                                <InputError message={errors[`sponsors.${idx}.website` as keyof typeof errors]} />
                             </div>
 
                             <div className="grid gap-1.5">
@@ -665,6 +697,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                                         }}
                                     />
                                 </label>
+                                <InputError message={errors[`sponsors.${idx}.logo` as keyof typeof errors]} />
                             </div>
                         </div>
                     ))}
