@@ -222,58 +222,59 @@ export default function VendorShow({ vendor, upcomingEvents, pastEvents }: Vendo
                         {upcomingEvents.length > 0 ? (
                             <div className="grid gap-6 sm:grid-cols-2">
                                 {upcomingEvents.map((event) => (
-                                    <Card
-                                        key={event.id}
-                                        className="neo-lift overflow-hidden border-2 border-foreground shadow-md"
-                                    >
-                                        <div className={`relative h-36 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                {event.banner ? (
-                                                    <img src={event.banner} alt={event.title} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <CalendarDays className="size-12 opacity-20" />
-                                                )}
+                                    <Link key={event.id} href={`/${vendor.username}/events/${event.slug}`}>
+                                        <Card
+                                            className="neo-lift h-full overflow-hidden border-2 border-foreground shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg"
+                                        >
+                                            <div className={`relative h-36 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    {event.banner ? (
+                                                        <img src={event.banner} alt={event.title} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <CalendarDays className="size-12 opacity-20" />
+                                                    )}
+                                                </div>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="absolute top-3 left-3 border-2 border-foreground font-mono text-xs"
+                                                >
+                                                    {event.category}
+                                                </Badge>
+                                                <Badge
+                                                    className="absolute top-3 right-3 border-2 border-foreground bg-secondary text-secondary-foreground font-mono text-xs"
+                                                >
+                                                    Akan Datang
+                                                </Badge>
                                             </div>
-                                            <Badge
-                                                variant="secondary"
-                                                className="absolute top-3 left-3 border-2 border-foreground font-mono text-xs"
-                                            >
-                                                {event.category}
-                                            </Badge>
-                                            <Badge
-                                                className="absolute top-3 right-3 border-2 border-foreground bg-secondary text-secondary-foreground font-mono text-xs"
-                                            >
-                                                Akan Datang
-                                            </Badge>
-                                        </div>
-                                        <CardHeader>
-                                            <CardTitle className="font-mono">{event.title}</CardTitle>
-                                            <CardDescription className="flex flex-col gap-1">
-                                                <span className="flex items-center gap-1.5">
-                                                    <CalendarDays className="size-3.5" />
-                                                    {event.date}
-                                                </span>
-                                                <span className="flex items-center gap-1.5">
-                                                    <MapPin className="size-3.5" />
-                                                    {event.location}
-                                                </span>
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardFooter className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                                <Users className="size-4" />
-                                                <span>{event.attendees}</span>
+                                            <CardHeader>
+                                                <CardTitle className="font-mono">{event.title}</CardTitle>
+                                                <CardDescription className="flex flex-col gap-1">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <CalendarDays className="size-3.5" />
+                                                        {event.date}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <MapPin className="size-3.5" />
+                                                        {event.location}
+                                                    </span>
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardFooter className="mt-auto flex items-center justify-between">
+                                                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                                    <Users className="size-4" />
+                                                    <span>{event.attendees}</span>
+                                                </div>
+                                                <span className="font-mono text-lg font-bold text-primary">{event.price}</span>
+                                            </CardFooter>
+                                            <div className="px-6 pb-6 mt-auto">
+                                                <Button className="w-full font-mono" size="lg" tabIndex={-1}>
+                                                    <Ticket data-icon="inline-start" />
+                                                    Daftar Sekarang
+                                                    <ChevronRight data-icon="inline-end" />
+                                                </Button>
                                             </div>
-                                            <span className="font-mono text-lg font-bold text-primary">{event.price}</span>
-                                        </CardFooter>
-                                        <div className="px-6 pb-6">
-                                            <Button className="w-full font-mono" size="lg">
-                                                <Ticket data-icon="inline-start" />
-                                                Daftar Sekarang
-                                                <ChevronRight data-icon="inline-end" />
-                                            </Button>
-                                        </div>
-                                    </Card>
+                                        </Card>
+                                    </Link>
                                 ))}
                             </div>
                         ) : (
@@ -298,45 +299,46 @@ export default function VendorShow({ vendor, upcomingEvents, pastEvents }: Vendo
 
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {pastEvents.map((event) => (
-                                <Card
-                                    key={event.id}
-                                    className="neo-lift overflow-hidden border-2 border-foreground opacity-80 shadow-md"
-                                >
-                                    <div className={`relative h-28 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            {event.banner ? (
-                                                <img src={event.banner} alt={event.title} className="w-full h-full object-cover grayscale opacity-60" />
-                                            ) : (
-                                                <CalendarDays className="size-10 opacity-20" />
-                                            )}
+                                <Link key={event.id} href={`/${vendor.username}/events/${event.slug}`}>
+                                    <Card
+                                        className="neo-lift h-full overflow-hidden border-2 border-foreground opacity-80 shadow-md transition-transform hover:-translate-y-1 hover:opacity-100 hover:shadow-lg"
+                                    >
+                                        <div className={`relative h-28 ${event.bgColor} border-b-2 border-foreground overflow-hidden`}>
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                {event.banner ? (
+                                                    <img src={event.banner} alt={event.title} className="w-full h-full object-cover grayscale opacity-60 transition-all hover:grayscale-0 hover:opacity-100" />
+                                                ) : (
+                                                    <CalendarDays className="size-10 opacity-20" />
+                                                )}
+                                            </div>
+                                            <Badge
+                                                variant="secondary"
+                                                className="absolute top-3 left-3 border-2 border-foreground font-mono text-xs"
+                                            >
+                                                {event.category}
+                                            </Badge>
+                                            <Badge
+                                                variant="outline"
+                                                className="absolute top-3 right-3 border-2 border-foreground bg-background font-mono text-xs"
+                                            >
+                                                Selesai
+                                            </Badge>
                                         </div>
-                                        <Badge
-                                            variant="secondary"
-                                            className="absolute top-3 left-3 border-2 border-foreground font-mono text-xs"
-                                        >
-                                            {event.category}
-                                        </Badge>
-                                        <Badge
-                                            variant="outline"
-                                            className="absolute top-3 right-3 border-2 border-foreground bg-background font-mono text-xs"
-                                        >
-                                            Selesai
-                                        </Badge>
-                                    </div>
-                                    <CardHeader>
-                                        <CardTitle className="font-mono text-sm">{event.title}</CardTitle>
-                                        <CardDescription className="flex flex-col gap-1 text-xs">
-                                            <span className="flex items-center gap-1.5">
-                                                <CalendarDays className="size-3" />
-                                                {event.date}
-                                            </span>
-                                            <span className="flex items-center gap-1.5">
-                                                <Users className="size-3" />
-                                                {event.attendees} peserta
-                                            </span>
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
+                                        <CardHeader>
+                                            <CardTitle className="font-mono text-sm">{event.title}</CardTitle>
+                                            <CardDescription className="flex flex-col gap-1 text-xs">
+                                                <span className="flex items-center gap-1.5">
+                                                    <CalendarDays className="size-3" />
+                                                    {event.date}
+                                                </span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <Users className="size-3" />
+                                                    {event.attendees} peserta
+                                                </span>
+                                            </CardDescription>
+                                        </CardHeader>
+                                    </Card>
+                                </Link>
                             ))}
                         </div>
                     </div>

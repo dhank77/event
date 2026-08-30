@@ -13,5 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/vendor.php';
 
-// Vendor profile — must be last to avoid catching other routes
+use App\Http\Controllers\PublicEventController;
+
+// Vendor profile and public event page — must be last to avoid catching other routes
+Route::get('{user:username}/events/{event:slug}', [PublicEventController::class, 'show'])->name('events.show');
 Route::get('{user:username}', [VendorProfileController::class, 'show'])->name('vendor.show');
