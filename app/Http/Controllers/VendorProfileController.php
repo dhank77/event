@@ -19,8 +19,9 @@ class VendorProfileController extends Controller
                 'username' => $user->username,
                 'role' => $user->role,
                 'joined' => $user->created_at?->format('F Y'),
-                'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+                'avatar' => $user->avatar ? asset('storage/'.$user->avatar) : null,
                 'about' => $user->about,
+                'social_media' => $user->social_media ?? [],
             ],
         ]);
     }

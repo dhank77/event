@@ -6,14 +6,17 @@ import { Separator } from '@/components/ui/separator';
 import {
     CalendarDays,
     ChevronRight,
+    Facebook,
     Globe,
     Instagram,
+    Linkedin,
     MapPin,
     Share2,
     Star,
     Ticket,
     Twitter,
     Users,
+    Youtube,
 } from 'lucide-react';
 
 type VendorProps = {
@@ -24,6 +27,7 @@ type VendorProps = {
         joined: string;
         avatar: string | null;
         about: string | null;
+        social_media: Record<string, string>;
     };
 };
 
@@ -147,18 +151,53 @@ export default function VendorShow({ vendor }: VendorProps) {
                                 </p>
                             </div>
 
-                            {/* Social links (static) */}
-                            <div className="flex gap-2 sm:pb-2">
-                                <Button variant="outline" size="icon" className="border-2 border-foreground">
-                                    <Instagram />
-                                </Button>
-                                <Button variant="outline" size="icon" className="border-2 border-foreground">
-                                    <Twitter />
-                                </Button>
-                                <Button variant="outline" size="icon" className="border-2 border-foreground">
-                                    <Globe />
-                                </Button>
-                            </div>
+                            {/* Social links (dynamic) */}
+                            {Object.keys(vendor.social_media || {}).length > 0 && (
+                                <div className="flex flex-wrap gap-2 sm:pb-2">
+                                    {vendor.social_media.instagram && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.instagram} target="_blank" rel="noreferrer">
+                                                <Instagram className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                    {vendor.social_media.twitter && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.twitter} target="_blank" rel="noreferrer">
+                                                <Twitter className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                    {vendor.social_media.facebook && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.facebook} target="_blank" rel="noreferrer">
+                                                <Facebook className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                    {vendor.social_media.linkedin && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.linkedin} target="_blank" rel="noreferrer">
+                                                <Linkedin className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                    {vendor.social_media.youtube && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.youtube} target="_blank" rel="noreferrer">
+                                                <Youtube className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                    {vendor.social_media.website && (
+                                        <Button variant="outline" size="icon" className="border-2 border-foreground" asChild>
+                                            <a href={vendor.social_media.website} target="_blank" rel="noreferrer">
+                                                <Globe className="size-4" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
