@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { toast } from 'sonner';
 import SocialMediaController from '@/actions/App/Http/Controllers/Settings/SocialMediaController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -28,6 +29,9 @@ export default function SocialMedia({
                     {...SocialMediaController.update.form()}
                     options={{
                         preserveScroll: true,
+                        onSuccess: () => {
+                            toast.success('Pengaturan sosial media berhasil disimpan.');
+                        },
                     }}
                     className="space-y-6"
                 >
