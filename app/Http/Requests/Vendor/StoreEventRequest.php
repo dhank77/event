@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Vendor;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Validator;
 
 class StoreEventRequest extends FormRequest
 {
@@ -22,7 +25,7 @@ class StoreEventRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:100'],
             'type' => ['required', 'in:online,offline,hybrid'],
             'status' => ['required', 'in:draft,published'],
-            'banner' => ['nullable', 'image', 'max:4096'],
+            'banner' => $this->imageOrStringRule(4096, 'banner'),
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
             'max_attendees' => ['nullable', 'integer', 'min:1'],
@@ -37,7 +40,7 @@ class StoreEventRequest extends FormRequest
 
             // Agendas
             'agendas' => ['nullable', 'array'],
-            'agendas.*.time' => ['nullable', 'date_format:H:i'],
+            'agendas.*.time' => ['nullable', 'date_format:H:i,H:i:s'],
             'agendas.*.title' => ['required_with:agendas', 'string', 'max:255'],
             'agendas.*.description' => ['nullable', 'string'],
             'agendas.*.speaker' => ['nullable', 'string', 'max:255'],
@@ -47,14 +50,38 @@ class StoreEventRequest extends FormRequest
             'speakers.*.name' => ['required_with:speakers', 'string', 'max:255'],
             'speakers.*.title' => ['nullable', 'string', 'max:255'],
             'speakers.*.bio' => ['nullable', 'string'],
-            'speakers.*.avatar' => ['nullable', 'image', 'max:2048'],
+            'speakers.*.avatar' => $this->imageOrStringRule(2048, 'avatar'),
 
             // Sponsors
             'sponsors' => ['nullable', 'array'],
             'sponsors.*.name' => ['required_with:sponsors', 'string', 'max:255'],
-            'sponsors.*.logo' => ['nullable', 'image', 'max:2048'],
+            'sponsors.*.logo' => $this->imageOrStringRule(2048, 'logo'),
             'sponsors.*.website' => ['nullable', 'url', 'max:500'],
             'sponsors.*.tier' => ['nullable', 'in:gold,silver,bronze,media'],
+        ];
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    private function imageOrStringRule(int $maxKilobytes, string $label): array
+    {
+        return [
+            'nullable',
+            function (string $attribute, mixed $value, Closure $fail) use ($maxKilobytes, $label): void {
+                if ($value instanceof UploadedFile) {
+                    $validator = Validator::make(
+                        [$attribute => $value],
+                        [$attribute => ['image', "max:{$maxKilobytes}"]]
+                    );
+
+                    if ($validator->fails()) {
+                        $fail($validator->errors()->first($attribute));
+                    }
+                } elseif (! is_string($value)) {
+                    $fail("File {$label} harus berupa gambar.");
+                }
+            },
         ];
     }
 }

@@ -143,3 +143,60 @@ it('forbids non-vendor users from creating events', function (): void {
         ])
         ->assertForbidden();
 });
+
+it('updates an event with agendas having H:i or H:i:s and existing speaker avatar and sponsor logo strings', function (): void {
+    $event = Event::factory()->create(['user_id' => $this->vendor->id]);
+
+    $this->actingAs($this->vendor)
+        ->put("/vendor/events/{$event->id}", [
+            'title' => 'Updated Event With Agendas & Speakers',
+            'type' => 'offline',
+            'status' => 'published',
+            'agendas' => [
+                [
+                    'time' => '09:00:00',
+                    'title' => 'Opening Keynote',
+                    'description' => 'Welcome speech',
+                    'speaker' => 'Jane Doe',
+                ],
+                [
+                    'time' => '10:30',
+                    'title' => 'Second Session',
+                    'description' => 'Deep dive',
+                    'speaker' => 'John Doe',
+                ],
+            ],
+            'speakers' => [
+                [
+                    'name' => 'Jane Doe',
+                    'title' => 'CTO',
+                    'bio' => 'Speaker bio',
+                    'avatar' => 'events/speakers/existing-avatar.jpg',
+                ],
+            ],
+            'sponsors' => [
+                [
+                    'name' => 'Acme Corp',
+                    'tier' => 'gold',
+                    'website' => 'https://acme.test',
+                    'logo' => 'events/sponsors/existing-logo.png',
+                ],
+            ],
+        ])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('event_agendas', [
+        'event_id' => $event->id,
+        'title' => 'Opening Keynote',
+    ]);
+
+    $this->assertDatabaseHas('event_speakers', [
+        'event_id' => $event->id,
+        'name' => 'Jane Doe',
+    ]);
+
+    $this->assertDatabaseHas('event_sponsors', [
+        'event_id' => $event->id,
+        'name' => 'Acme Corp',
+    ]);
+});

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,7 +35,7 @@ class ProfileController extends Controller
 
         if ($request->hasFile('avatar')) {
             if ($request->user()->avatar) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($request->user()->avatar);
+                Storage::disk('public')->delete($request->user()->avatar);
             }
             $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
