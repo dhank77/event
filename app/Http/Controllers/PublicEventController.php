@@ -21,9 +21,7 @@ class PublicEventController extends Controller
             'agendas',
             'speakers',
             'sponsors',
-            'tickets' => fn ($query) => $query->where('is_active', true)
-                ->where(fn ($q) => $q->whereNull('sales_start')->orWhere('sales_start', '<=', now()))
-                ->where(fn ($q) => $q->whereNull('sales_end')->orWhere('sales_end', '>=', now())),
+            'tickets' => fn ($query) => $query->where('is_active', true)->orderBy('price'),
         ]);
 
         return Inertia::render('events/show', [
@@ -55,7 +53,24 @@ class PublicEventController extends Controller
                 'sponsors' => $event->sponsors->map(fn ($s) => array_merge($s->toArray(), [
                     'logo_url' => $s->logo ? asset('storage/'.$s->logo) : null,
                 ])),
-                'tickets' => $event->tickets,
+                'tickets' => $event->tickets->map(fn ($ticket) => [
+                    'id' => $ticket->id,
+                    'name' => $ticket->name,
+                    'type' => $ticket->type,
+                    'tier' => $ticket->tier,
+                    'price' => $ticket->price,
+                    'quota' => $ticket->quota,
+                    'max_per_order' => $ticket->max_per_order,
+                    'description' => $ticket->description,
+                    'sales_start' => $ticket->sales_start?->toIso8601String(),
+                    'sales_end' => $ticket->sales_end?->toIso8601String(),
+                    'sales_status' => match (true) {
+                        $ticket->quota !== null && $ticket->quota <= 0 => 'sold_out',
+                        $ticket->sales_start && $ticket->sales_start->isFuture() => 'upcoming',
+                        $ticket->sales_end && $ticket->sales_end->isPast() => 'ended',
+                        default => 'available',
+                    },
+                ]),
             ],
         ]);
     }
