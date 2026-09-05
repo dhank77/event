@@ -1,10 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     CalendarDays,
-    CheckCircle2,
     ChevronLeft,
     Clock,
-    Globe,
+    Loader2,
     MapPin,
     Minus,
     MonitorPlay,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { store } from '@/actions/App/Http/Controllers/CheckoutController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,12 +107,13 @@ export default function EventShow({ vendor, event }: EventShowProps) {
 
     const [selectedTickets, setSelectedTickets] = useState<Record<number, number>>({});
     const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [buyerForm, setBuyerForm] = useState({
         name: auth?.user?.name || '',
         email: auth?.user?.email || '',
         phone: '',
     });
-    const [orderSuccess, setOrderSuccess] = useState(false);
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
     const updateQuantity = (ticketId: number, qty: number, maxQty: number) => {
         const validQty = Math.max(0, Math.min(qty, maxQty));
@@ -138,8 +139,40 @@ export default function EventShow({ vendor, event }: EventShowProps) {
             toast.error('Mohon lengkapi semua data pemesan.');
             return;
         }
-        setOrderSuccess(true);
-        toast.success('Pemesanan tiket berhasil dikonfirmasi!');
+
+        const items = Object.entries(selectedTickets)
+            .filter(([, qty]) => qty > 0)
+            .map(([ticketId, quantity]) => ({
+                ticket_id: Number(ticketId),
+                quantity,
+            }));
+
+        setIsSubmitting(true);
+        setFormErrors({});
+
+        router.post(
+            store().url,
+            {
+                event_id: event.id,
+                buyer_name: buyerForm.name,
+                buyer_email: buyerForm.email,
+                buyer_phone: buyerForm.phone,
+                items,
+            },
+            {
+                onError: (errors) => {
+                    setIsSubmitting(false);
+                    setFormErrors(errors);
+                    const firstError = Object.values(errors)[0];
+                    if (firstError) {
+                        toast.error(firstError);
+                    }
+                },
+                onFinish: () => {
+                    setIsSubmitting(false);
+                },
+            },
+        );
     };
 
     // Format price Helper
@@ -491,10 +524,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                             className="w-full font-mono text-sm shadow-[2px_2px_0_0_#000] cursor-pointer"
                                             size="lg"
                                             disabled={totalTickets === 0}
-                                            onClick={() => {
-                                                setOrderSuccess(false);
-                                                setCheckoutOpen(true);
-                                            }}
+                                            onClick={() => setCheckoutOpen(true)}
                                         >
                                             <ShoppingBag className="mr-2 size-4" />
                                             Checkout Pembelian
@@ -507,122 +537,138 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                 </main>
 
                 {/* ═══ CHECKOUT DIALOG ═══ */}
-                <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
+                <Dialog open={checkoutOpen} onOpenChange={(open) => { if (!isSubmitting) setCheckoutOpen(open); }}>
                     <DialogContent className="border-2 border-foreground shadow-[6px_6px_0_0_#000] sm:max-w-lg">
-                        {!orderSuccess ? (
-                            <>
-                                <DialogHeader>
-                                    <DialogTitle className="font-mono text-xl font-bold">
-                                        Pemesanan Tiket
-                                    </DialogTitle>
-                                    <DialogDescription className="font-sans text-xs">
-                                        {event.title} • {event.formatted_date}
-                                    </DialogDescription>
-                                </DialogHeader>
+                        <DialogHeader>
+                            <DialogTitle className="font-mono text-xl font-bold">
+                                Pemesanan Tiket
+                            </DialogTitle>
+                            <DialogDescription className="font-sans text-xs">
+                                {event.title} • {event.formatted_date}
+                            </DialogDescription>
+                        </DialogHeader>
 
-                                <div className="space-y-4 py-2">
-                                    {/* Ringkasan Tiket */}
-                                    <div className="rounded-lg border-2 border-foreground bg-muted/40 p-3 space-y-2">
-                                        <p className="font-mono text-xs font-bold uppercase text-muted-foreground">
-                                            Ringkasan Tiket
-                                        </p>
-                                        {event.tickets
-                                            .filter((t) => (selectedTickets[t.id] || 0) > 0)
-                                            .map((t) => (
-                                                <div key={t.id} className="flex justify-between items-center text-xs font-mono">
-                                                    <span>
-                                                        {t.name} x {selectedTickets[t.id]}
-                                                    </span>
-                                                    <span className="font-bold">
-                                                        {formatPrice(t.price * selectedTickets[t.id])}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        <Separator className="border-foreground/30 my-2" />
-                                        <div className="flex justify-between items-center font-mono font-bold text-sm">
-                                            <span>Total Pembayaran:</span>
-                                            <span className="text-primary">{formatPrice(totalPrice)}</span>
+                        <div className="space-y-4 py-2">
+                            {/* Ringkasan Tiket */}
+                            <div className="rounded-lg border-2 border-foreground bg-muted/40 p-3 space-y-2">
+                                <p className="font-mono text-xs font-bold uppercase text-muted-foreground">
+                                    Ringkasan Tiket
+                                </p>
+                                {event.tickets
+                                    .filter((t) => (selectedTickets[t.id] || 0) > 0)
+                                    .map((t) => (
+                                        <div key={t.id} className="flex justify-between items-center text-xs font-mono">
+                                            <span>
+                                                {t.name} x {selectedTickets[t.id]}
+                                            </span>
+                                            <span className="font-bold">
+                                                {formatPrice(t.price * selectedTickets[t.id])}
+                                            </span>
                                         </div>
-                                    </div>
-
-                                    {/* Form Data Pemesan */}
-                                    <div className="space-y-3">
-                                        <div className="grid gap-1.5">
-                                            <Label htmlFor="buyer_name" className="text-xs font-mono">
-                                                Nama Lengkap <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Input
-                                                id="buyer_name"
-                                                value={buyerForm.name}
-                                                onChange={(e) => setBuyerForm({ ...buyerForm, name: e.target.value })}
-                                                placeholder="Masukkan nama lengkap"
-                                                className="border-2 border-foreground font-sans text-sm"
-                                            />
-                                        </div>
-                                        <div className="grid gap-1.5">
-                                            <Label htmlFor="buyer_email" className="text-xs font-mono">
-                                                Email <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Input
-                                                id="buyer_email"
-                                                type="email"
-                                                value={buyerForm.email}
-                                                onChange={(e) => setBuyerForm({ ...buyerForm, email: e.target.value })}
-                                                placeholder="nama@email.com"
-                                                className="border-2 border-foreground font-sans text-sm"
-                                            />
-                                        </div>
-                                        <div className="grid gap-1.5">
-                                            <Label htmlFor="buyer_phone" className="text-xs font-mono">
-                                                Nomor WhatsApp / Telepon <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Input
-                                                id="buyer_phone"
-                                                type="tel"
-                                                value={buyerForm.phone}
-                                                onChange={(e) => setBuyerForm({ ...buyerForm, phone: e.target.value })}
-                                                placeholder="08xxxxxxxxxx"
-                                                className="border-2 border-foreground font-sans text-sm"
-                                            />
-                                        </div>
-                                    </div>
+                                    ))}
+                                <Separator className="border-foreground/30 my-2" />
+                                <div className="flex justify-between items-center font-mono font-bold text-sm">
+                                    <span>Total Pembayaran:</span>
+                                    <span className="text-primary">{formatPrice(totalPrice)}</span>
                                 </div>
-
-                                <DialogFooter className="gap-2 sm:gap-0">
-                                    <Button variant="outline" onClick={() => setCheckoutOpen(false)} className="font-mono text-xs">
-                                        Batal
-                                    </Button>
-                                    <Button
-                                        className="font-mono text-xs font-bold"
-                                        onClick={handleConfirmOrder}
-                                        disabled={!buyerForm.name.trim() || !buyerForm.email.trim() || !buyerForm.phone.trim()}
-                                    >
-                                        Konfirmasi Pemesanan
-                                    </Button>
-                                </DialogFooter>
-                            </>
-                        ) : (
-                            <div className="space-y-4 py-6 text-center">
-                                <div className="mx-auto flex size-14 items-center justify-center rounded-full border-2 border-foreground bg-primary text-primary-foreground shadow-[2px_2px_0_0_#000]">
-                                    <CheckCircle2 className="size-8" />
-                                </div>
-                                <div>
-                                    <h3 className="font-mono text-xl font-bold">Pemesanan Berhasil!</h3>
-                                    <p className="mt-1 text-xs text-muted-foreground font-sans">
-                                        Terima kasih <strong>{buyerForm.name}</strong>, tiket untuk <strong>{event.title}</strong> telah dipesan. Detail tiket telah dikonfirmasi dan dikirim ke <strong>{buyerForm.email}</strong>.
-                                    </p>
-                                </div>
-                                <Button
-                                    className="font-mono text-xs font-bold"
-                                    onClick={() => {
-                                        setCheckoutOpen(false);
-                                        setSelectedTickets({});
-                                    }}
-                                >
-                                    Tutup
-                                </Button>
                             </div>
-                        )}
+
+                            {/* Form Data Pemesan */}
+                            <div className="space-y-3">
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="buyer_name" className="text-xs font-mono">
+                                        Nama Lengkap <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="buyer_name"
+                                        value={buyerForm.name}
+                                        onChange={(e) => setBuyerForm({ ...buyerForm, name: e.target.value })}
+                                        placeholder="Masukkan nama lengkap"
+                                        className="border-2 border-foreground font-sans text-sm"
+                                        disabled={isSubmitting}
+                                    />
+                                    {formErrors.buyer_name && (
+                                        <p className="text-xs text-destructive font-mono">{formErrors.buyer_name}</p>
+                                    )}
+                                </div>
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="buyer_email" className="text-xs font-mono">
+                                        Email <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="buyer_email"
+                                        type="email"
+                                        value={buyerForm.email}
+                                        onChange={(e) => setBuyerForm({ ...buyerForm, email: e.target.value })}
+                                        placeholder="nama@email.com"
+                                        className="border-2 border-foreground font-sans text-sm"
+                                        disabled={isSubmitting}
+                                    />
+                                    {formErrors.buyer_email && (
+                                        <p className="text-xs text-destructive font-mono">{formErrors.buyer_email}</p>
+                                    )}
+                                </div>
+                                <div className="grid gap-1.5">
+                                    <Label htmlFor="buyer_phone" className="text-xs font-mono">
+                                        Nomor WhatsApp / Telepon <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="buyer_phone"
+                                        type="tel"
+                                        value={buyerForm.phone}
+                                        onChange={(e) => setBuyerForm({ ...buyerForm, phone: e.target.value })}
+                                        placeholder="08xxxxxxxxxx"
+                                        className="border-2 border-foreground font-sans text-sm"
+                                        disabled={isSubmitting}
+                                    />
+                                    {formErrors.buyer_phone && (
+                                        <p className="text-xs text-destructive font-mono">{formErrors.buyer_phone}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {(formErrors.payment || formErrors.items) && (
+                                <p className="text-xs text-destructive font-mono rounded border border-destructive/30 bg-destructive/5 p-2">
+                                    {formErrors.payment || formErrors.items}
+                                </p>
+                            )}
+
+                            {isSubmitting && (
+                                <p className="text-xs text-muted-foreground font-mono text-center">
+                                    Sedang memproses, Anda akan diarahkan ke halaman pembayaran…
+                                </p>
+                            )}
+                        </div>
+
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <Button
+                                variant="outline"
+                                onClick={() => setCheckoutOpen(false)}
+                                className="font-mono text-xs"
+                                disabled={isSubmitting}
+                            >
+                                Batal
+                            </Button>
+                            <Button
+                                className="font-mono text-xs font-bold"
+                                onClick={handleConfirmOrder}
+                                disabled={
+                                    isSubmitting ||
+                                    !buyerForm.name.trim() ||
+                                    !buyerForm.email.trim() ||
+                                    !buyerForm.phone.trim()
+                                }
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="mr-2 size-3 animate-spin" />
+                                        Memproses…
+                                    </>
+                                ) : (
+                                    'Konfirmasi & Bayar'
+                                )}
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>

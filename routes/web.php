@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VendorProfileController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,10 @@ require __DIR__.'/settings.php';
 require __DIR__.'/vendor.php';
 
 use App\Http\Controllers\PublicEventController;
+
+// Checkout & Order routes
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/orders/{orderNumber}', [CheckoutController::class, 'show'])->name('orders.show');
 
 // Vendor profile and public event page — must be last to avoid catching other routes
 Route::get('{user:username}/events/{event:slug}', [PublicEventController::class, 'show'])->name('events.show');
