@@ -30,7 +30,7 @@ class EventController extends Controller
             ->withCount('tickets')
             ->latest()
             ->get()
-            ->map(fn (Event $event) => [
+            ->map(fn(Event $event) => [
                 'id' => $event->id,
                 'title' => $event->title,
                 'slug' => $event->slug,
@@ -121,7 +121,7 @@ class EventController extends Controller
                 'starts_at' => $event->starts_at?->format('Y-m-d\TH:i'),
                 'ends_at' => $event->ends_at?->format('Y-m-d\TH:i'),
                 'max_attendees' => $event->max_attendees,
-                'agendas' => $event->agendas->map(fn ($a) => [
+                'agendas' => $event->agendas->map(fn($a) => [
                     'id' => $a->id,
                     'time' => $a->time,
                     'title' => $a->title,
@@ -129,7 +129,7 @@ class EventController extends Controller
                     'speaker' => $a->speaker,
                     'order' => $a->order,
                 ]),
-                'speakers' => $event->speakers->map(fn ($s) => [
+                'speakers' => $event->speakers->map(fn($s) => [
                     'id' => $s->id,
                     'name' => $s->name,
                     'title' => $s->title,
@@ -137,7 +137,7 @@ class EventController extends Controller
                     'avatar' => $s->avatar,
                     'order' => $s->order,
                 ]),
-                'sponsors' => $event->sponsors->map(fn ($sp) => [
+                'sponsors' => $event->sponsors->map(fn($sp) => [
                     'id' => $sp->id,
                     'name' => $sp->name,
                     'logo' => $sp->logo,
@@ -145,7 +145,7 @@ class EventController extends Controller
                     'tier' => $sp->tier,
                     'order' => $sp->order,
                 ]),
-                'tickets' => $event->tickets->map(fn ($t) => [
+                'tickets' => $event->tickets->map(fn($t) => [
                     'id' => $t->id,
                     'name' => $t->name,
                     'type' => $t->type,
@@ -158,7 +158,7 @@ class EventController extends Controller
                     'description' => $t->description,
                     'is_active' => $t->is_active,
                 ]),
-                'coupons' => $event->coupons->map(fn ($c) => [
+                'coupons' => $event->coupons->map(fn($c) => [
                     'id' => $c->id,
                     'code' => $c->code,
                     'type' => $c->type,

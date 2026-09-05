@@ -13,7 +13,7 @@ import {
     Trash2,
     Users,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { RichTextEditor } from '@/components/rich-text-editor';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
@@ -98,6 +98,13 @@ interface EventFormProps {
 
 export function EventForm({ defaultValues, action, method, submitLabel }: EventFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
+    const lastStepChangeTime = useRef<number>(0);
+
+    const goToStep = (step: number | ((prev: number) => number)) => {
+        lastStepChangeTime.current = Date.now();
+        setCurrentStep(step);
+    };
+
     const [bannerPreview, setBannerPreview] = useState<string | null>(
         defaultValues.banner && typeof defaultValues.banner === 'string'
             ? `/storage/${defaultValues.banner}`
@@ -126,6 +133,17 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
     function submit(e: React.FormEvent) {
         e.preventDefault();
 
+        // Hanya izinkan submit jika berada di langkah terakhir (Publikasi)
+        if (currentStep < STEPS.length - 1) {
+            goToStep((s) => Math.min(STEPS.length - 1, s + 1));
+            return;
+        }
+
+        // Mencegah double click yang tidak sengaja memicu submit saat baru berpindah ke langkah publikasi
+        if (Date.now() - lastStepChangeTime.current < 400) {
+            return;
+        }
+
         const options = {
             preserveScroll: true,
             forceFormData: true,
@@ -137,15 +155,15 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                     // Determine which step to go to based on first error
                     const firstError = errorKeys[0];
                     if (['title', 'description', 'category', 'type', 'banner'].includes(firstError)) {
-                        setCurrentStep(0);
+                        goToStep(0);
                     } else if (['location', 'maps_url', 'online_platform', 'online_url'].includes(firstError)) {
-                        setCurrentStep(1);
+                        goToStep(1);
                     } else if (firstError.startsWith('agendas') || firstError.startsWith('speakers')) {
-                        setCurrentStep(2);
+                        goToStep(2);
                     } else if (firstError.startsWith('sponsors')) {
-                        setCurrentStep(3);
+                        goToStep(3);
                     } else if (['starts_at', 'ends_at', 'max_attendees', 'status'].includes(firstError)) {
-                        setCurrentStep(4);
+                        goToStep(4);
                     }
                 }
             }
@@ -208,7 +226,18 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
     const showOnline = data.type === 'online' || data.type === 'hybrid';
 
     return (
-        <form onSubmit={submit} className="space-y-6">
+        <form
+            onSubmit={submit}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+                    if (currentStep < STEPS.length - 1) {
+                        e.preventDefault();
+                        goToStep((s) => Math.min(STEPS.length - 1, s + 1));
+                    }
+                }
+            }}
+            className="space-y-6"
+        >
             {/* Step navigator */}
             <div className="flex gap-1 overflow-x-auto pb-2">
                 {STEPS.map((step, idx) => {
@@ -217,7 +246,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                         <button
                             key={step.id}
                             type="button"
-                            onClick={() => setCurrentStep(idx)}
+                            onClick={() => goToStep(idx)}
                             className={cn(
                                 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
                                 currentStep === idx
@@ -783,7 +812,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                 <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
+                    onClick={() => goToStep((s) => Math.max(0, s - 1))}
                     disabled={currentStep === 0}
                 >
                     ← Sebelumnya
@@ -794,7 +823,7 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
                         <button
                             key={idx}
                             type="button"
-                            onClick={() => setCurrentStep(idx)}
+                            onClick={() => goToStep(idx)}
                             className={cn(
                                 'h-2 w-2 rounded-full transition-all',
                                 idx === currentStep ? 'bg-primary w-4' : 'bg-muted-foreground/30',
@@ -805,13 +834,14 @@ export function EventForm({ defaultValues, action, method, submitLabel }: EventF
 
                 {currentStep < STEPS.length - 1 ? (
                     <Button
+                        key="btn-next"
                         type="button"
-                        onClick={() => setCurrentStep((s) => Math.min(STEPS.length - 1, s + 1))}
+                        onClick={() => goToStep((s) => Math.min(STEPS.length - 1, s + 1))}
                     >
                         Selanjutnya →
                     </Button>
                 ) : (
-                    <Button type="submit" disabled={processing}>
+                    <Button key="btn-submit" type="submit" disabled={processing}>
                         <Ticket className="mr-2 h-4 w-4" />
                         {processing ? 'Menyimpan...' : submitLabel}
                     </Button>
