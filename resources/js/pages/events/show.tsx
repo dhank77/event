@@ -374,8 +374,8 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                         </div>
 
                         {/* ═══ SIDEBAR ═══ */}
-                        <div className="space-y-6">
-                            {/* 1. TICKETS CARD (PRIMARY) */}
+                        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+                            {/* TICKETS CARD (PRIMARY) */}
                             <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000]">
                                 <CardHeader className="bg-primary text-primary-foreground border-b-2 border-foreground pb-4">
                                     <div className="flex items-center gap-2">
@@ -502,77 +502,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                     </CardFooter>
                                 )}
                             </Card>
-
-                            {/* 2. EVENT DETAILS CARD */}
-                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000]">
-                                <CardHeader className="bg-muted border-b-2 border-foreground pb-4">
-                                    <CardTitle className="font-mono text-xl">Informasi Pelaksanaan</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6 pt-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-accent">
-                                            <CalendarDays className="size-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-mono font-bold">Waktu</p>
-                                            <p className="text-sm text-muted-foreground">{event.formatted_date}</p>
-                                            {event.formatted_end_date && (
-                                                <p className="text-sm text-muted-foreground">s.d {event.formatted_end_date}</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {isOffline && (
-                                        <div className="flex items-start gap-4">
-                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-primary text-primary-foreground">
-                                                <MapPin className="size-5" />
-                                            </div>
-                                            <div>
-                                                <p className="font-mono font-bold">Lokasi</p>
-                                                <p className="text-sm text-muted-foreground">{event.location || 'Menyusul'}</p>
-                                                {event.maps_url && (
-                                                    <a href={event.maps_url} target="_blank" rel="noreferrer" className="text-xs text-primary underline hover:text-primary/80">
-                                                        Lihat Peta
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {isOnline && (
-                                        <div className="flex items-start gap-4">
-                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-secondary text-secondary-foreground">
-                                                <MonitorPlay className="size-5" />
-                                            </div>
-                                            <div>
-                                                <p className="font-mono font-bold">Online Platform</p>
-                                                <p className="text-sm text-muted-foreground">{event.online_platform || 'Menyusul'}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    <Separator className="border-foreground" />
-
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-foreground bg-muted">
-                                                {vendor.avatar ? (
-                                                    <img src={vendor.avatar} alt={vendor.name} className="h-full w-full object-cover" />
-                                                ) : (
-                                                    <Users className="m-1.5 size-4 opacity-50" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-muted-foreground">Diselenggarakan oleh</p>
-                                                <Link href={`/${vendor.username}`} className="font-mono text-sm font-bold hover:underline">
-                                                    {vendor.name}
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
+                        </aside>
                     </div>
                 </main>
 
