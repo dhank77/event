@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+        'url' => env('FONNTE_URL', 'https://api.fonnte.com/send'),
+        'country_code' => env('FONNTE_COUNTRY_CODE', '62'),
+    ],
+
 ];

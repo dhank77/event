@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventTicket;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\FonnteService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -21,8 +22,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CheckoutController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        protected FonnteService $fonnteService,
+    ) {
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -114,6 +116,8 @@ class CheckoutController extends Controller
 
         // Free order — go straight to success page
         if ($isFree) {
+            $this->fonnteService->sendOrderPaidNotification($order);
+
             return redirect()->route('orders.show', $order->order_number);
         }
 
@@ -150,6 +154,8 @@ class CheckoutController extends Controller
                 'snap_redirect_url' => $snapRedirectUrl,
             ]);
 
+            $this->fonnteService->sendOrderPendingNotification($order);
+
             return redirect()->route('orders.show', $order->order_number);
         } catch (\Exception $e) {
             $order->update(['status' => 'cancelled']);
@@ -182,6 +188,10 @@ class CheckoutController extends Controller
             if ($newStatus !== $order->status) {
                 $order->update(['status' => $newStatus]);
                 $order->refresh();
+
+                if ($newStatus === 'paid') {
+                    $this->fonnteService->sendOrderPaidNotification($order);
+                }
             }
         }
 
@@ -252,10 +262,16 @@ class CheckoutController extends Controller
             default => $order->status,
         };
 
+        $wasNotPaid = $order->status !== 'paid';
+
         $order->update([
             'status' => $newStatus,
             'payment_type' => $request->payment_type ?? $order->payment_type,
         ]);
+
+        if ($wasNotPaid && $newStatus === 'paid') {
+            $this->fonnteService->sendOrderPaidNotification($order);
+        }
 
         return response()->json(['message' => 'Notification processed successfully']);
     }
