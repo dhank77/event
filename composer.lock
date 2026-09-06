@@ -4,8 +4,94 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b7c459afad5b637b3145f5f6644743a",
+    "content-hash": "6f248d733f8f4f093cc5b986e657ba69",
     "packages": [
+        {
+            "name": "akira/laravel-qrcode",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/akira-io/laravel-qrcode.git",
+                "reference": "26ee5a68b0c2a274cfafe4a2242ad5ed33fdfa5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/akira-io/laravel-qrcode/zipball/26ee5a68b0c2a274cfafe4a2242ad5ed33fdfa5e",
+                "reference": "26ee5a68b0c2a274cfafe4a2242ad5ed33fdfa5e",
+                "shasum": ""
+            },
+            "require": {
+                "bacon/bacon-qr-code": "^3.0",
+                "ext-gd": "*",
+                "ext-imagick": "*",
+                "illuminate/contracts": "^12.0 | ^13.0",
+                "illuminate/support": "^12.0 | ^13.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "akira/laravel-debugger": "^1.0",
+                "driftingly/rector-laravel": "^2.1",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^10.0 || ^11.0",
+                "peckphp/peck": "^v0.2.0 || ^0.3.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "4.1.0",
+                "pestphp/pest-plugin-type-coverage": "^4.0",
+                "phpstan/phpstan": "^2.0",
+                "rector/rector": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "QrCode": "Akira\\QrCode\\Facades\\QrCode"
+                    },
+                    "providers": [
+                        "Akira\\QrCode\\QrCodeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Akira\\QrCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kidiatoliny",
+                    "email": "kidiatoliny@gmail.com",
+                    "homepage": "https://github.com/kidiatoliny"
+                }
+            ],
+            "description": "A clean, modern, and easy-to-use QR code generator for Laravel",
+            "keywords": [
+                "akira",
+                "bacon",
+                "generator",
+                "laravel",
+                "qr",
+                "qrcode"
+            ],
+            "support": {
+                "issues": "https://github.com/akira-io/laravel-qrcode/issues",
+                "source": "https://github.com/akira-io/laravel-qrcode/tree/v2.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/kidiatoliny",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-16T15:07:23+00:00"
+        },
         {
             "name": "bacon/bacon-qr-code",
             "version": "v3.1.1",

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Akira\QrCode\Facades\QrCode;
 use App\Models\Event;
 use App\Models\EventTicket;
 use App\Models\Order;
@@ -157,12 +158,41 @@ class CheckoutController extends Controller
 
     /**
      * Display order status page.
+     * Also handles Midtrans finish callback query params to update order status
+     * in case the webhook hasn't fired yet.
      */
-    public function show(string $orderNumber): Response
+    public function show(string $orderNumber, Request $request): Response
     {
         $order = Order::with(['items', 'event'])
             ->where('order_number', $orderNumber)
             ->firstOrFail();
+
+        // Handle Midtrans finish callback query params
+        $transactionStatus = $request->query('transaction_status');
+        if ($transactionStatus && $order->status === 'pending') {
+            $newStatus = match ($transactionStatus) {
+                'settlement', 'capture' => 'paid',
+                'pending' => 'pending',
+                'deny', 'expire', 'cancel' => 'cancelled',
+                default => $order->status,
+            };
+
+            if ($newStatus !== $order->status) {
+                $order->update(['status' => $newStatus]);
+                $order->refresh();
+            }
+        }
+
+        $qrCode = null;
+        if ($order->status === 'paid') {
+            $svg = (string) QrCode::format('svg')
+                ->size(240)
+                ->margin(1)
+                ->errorCorrection('M')
+                ->generate($order->order_number);
+
+            $qrCode = 'data:image/svg+xml;base64,'.base64_encode($svg);
+        }
 
         return Inertia::render('orders/show', [
             'order' => [
@@ -174,6 +204,7 @@ class CheckoutController extends Controller
                 'status' => $order->status,
                 'payment_type' => $order->payment_type,
                 'snap_redirect_url' => $order->snap_redirect_url,
+                'qr_code' => $qrCode,
                 'event' => [
                     'title' => $order->event->title,
                     'slug' => $order->event->slug,

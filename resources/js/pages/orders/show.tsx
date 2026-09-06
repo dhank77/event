@@ -6,14 +6,16 @@ import {
     CheckCircle2,
     Clock,
     CreditCard,
+    Download,
     ExternalLink,
+    QrCode,
     Receipt,
     Ticket,
     XCircle,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 type OrderItem = {
@@ -33,6 +35,7 @@ type OrderData = {
     status: 'pending' | 'paid' | 'cancelled' | 'expired';
     payment_type: string | null;
     snap_redirect_url: string | null;
+    qr_code: string | null;
     event: {
         title: string;
         slug: string;
@@ -134,6 +137,52 @@ export default function OrderShow({ order }: OrderShowProps) {
                                 </div>
                             </div>
                         </div>
+
+                        {/* QR CODE / E-TICKET (ONLY FOR PAID ORDERS) */}
+                        {order.status === 'paid' && order.qr_code && (
+                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000] bg-card overflow-hidden">
+                                <CardHeader className="border-b-2 border-foreground bg-primary/10 pb-4 text-center">
+                                    <div className="flex items-center justify-center gap-2 font-mono font-bold text-sm">
+                                        <QrCode className="size-4 text-primary" />
+                                        <span>E-Ticket & QR Code Masuk</span>
+                                    </div>
+                                    <CardDescription className="font-mono text-xs">
+                                        Tunjukkan QR Code ini kepada panitia saat check-in di lokasi acara
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center justify-center py-8">
+                                    <div className="rounded-xl border-2 border-foreground p-4 bg-white shadow-[4px_4px_0_0_#000]">
+                                        <img
+                                            src={order.qr_code}
+                                            alt={`QR Code ${order.order_number}`}
+                                            className="size-48 sm:size-56 object-contain"
+                                        />
+                                    </div>
+                                    <div className="mt-5 text-center space-y-1">
+                                        <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+                                            Kode Pesanan / Check-In
+                                        </span>
+                                        <p className="font-mono font-black text-xl tracking-wider text-foreground">
+                                            {order.order_number}
+                                        </p>
+                                        <p className="font-sans text-sm text-muted-foreground">
+                                            Atas nama <strong className="font-semibold text-foreground">{order.buyer_name}</strong>
+                                        </p>
+                                    </div>
+                                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                                        <a
+                                            href={order.qr_code}
+                                            download={`tiket-${order.order_number}.svg`}
+                                        >
+                                            <Button variant="outline" size="sm" className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] hover:shadow-none transition-all">
+                                                <Download className="mr-1.5 size-3.5" />
+                                                Unduh QR Code
+                                            </Button>
+                                        </a>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* ORDER DETAIL CARD */}
                         <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000]">

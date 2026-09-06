@@ -137,7 +137,12 @@ it('displays order status page', function () {
     ]);
 
     $this->get(route('orders.show', $order->order_number))
-        ->assertOk();
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('orders/show')
+            ->has('order.qr_code')
+            ->where('order.status', 'paid')
+        );
 });
 
 it('returns 404 for non-existent order', function () {
