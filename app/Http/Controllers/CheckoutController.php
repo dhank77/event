@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventTicket;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CheckoutController extends Controller
 {
@@ -185,13 +187,13 @@ class CheckoutController extends Controller
 
         $qrCode = null;
         if ($order->status === 'paid') {
-            $svg = (string) QrCode::format('svg')
-                ->size(240)
+            $rawPng = QrCode::format('png')
+                ->size(280)
                 ->margin(1)
                 ->errorCorrection('M')
-                ->generate($order->order_number);
+                ->generateRaw($order->order_number);
 
-            $qrCode = 'data:image/svg+xml;base64,'.base64_encode($svg);
+            $qrCode = 'data:image/png;base64,'.base64_encode($rawPng);
         }
 
         return Inertia::render('orders/show', [
@@ -256,5 +258,57 @@ class CheckoutController extends Controller
         ]);
 
         return response()->json(['message' => 'Notification processed successfully']);
+    }
+
+    /**
+     * Download QR code as PNG image.
+     */
+    public function downloadQrCode(string $orderNumber): SymfonyResponse
+    {
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        if ($order->status !== 'paid') {
+            abort(403, 'QR Code hanya tersedia untuk pesanan yang sudah lunas.');
+        }
+
+        $rawPng = QrCode::format('png')
+            ->size(500)
+            ->margin(2)
+            ->errorCorrection('H')
+            ->generateRaw($order->order_number);
+
+        return response($rawPng, 200, [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'attachment; filename="qrcode-'.$order->order_number.'.png"',
+        ]);
+    }
+
+    /**
+     * Download E-Ticket as PDF using laravel-dompdf.
+     */
+    public function downloadPdf(string $orderNumber): SymfonyResponse
+    {
+        $order = Order::with(['items', 'event.vendor'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        if ($order->status !== 'paid') {
+            abort(403, 'E-Ticket hanya tersedia untuk pesanan yang sudah lunas.');
+        }
+
+        $rawPng = QrCode::format('png')
+            ->size(250)
+            ->margin(1)
+            ->errorCorrection('M')
+            ->generateRaw($order->order_number);
+
+        $qrCodeBase64 = base64_encode($rawPng);
+
+        $pdf = Pdf::loadView('pdf.ticket', [
+            'order' => $order,
+            'qrCodeBase64' => $qrCodeBase64,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('tiket-'.$order->order_number.'.pdf');
     }
 }

@@ -181,3 +181,64 @@ it('updates order status on valid midtrans settlement notification', function ()
     expect($order->fresh()->status)->toBe('paid');
     expect($order->fresh()->payment_type)->toBe('bank_transfer');
 });
+
+it('downloads qr code png for paid order', function () {
+    $order = Order::factory()->create([
+        'event_id' => $this->event->id,
+        'status' => 'paid',
+    ]);
+
+    $response = $this->get(route('orders.qrcode', $order->order_number));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Type', 'image/png');
+    $response->assertHeader('Content-Disposition', 'attachment; filename="qrcode-'.$order->order_number.'.png"');
+    expect(str_starts_with($response->getContent(), "\x89PNG\r\n\x1a\n"))->toBeTrue();
+});
+
+it('prevents qr code download for unpaid order', function () {
+    $order = Order::factory()->create([
+        'event_id' => $this->event->id,
+        'status' => 'pending',
+    ]);
+
+    $this->get(route('orders.qrcode', $order->order_number))->assertStatus(403);
+});
+
+it('downloads e-ticket pdf for paid order', function () {
+    $order = Order::factory()->create([
+        'event_id' => $this->event->id,
+        'status' => 'paid',
+    ]);
+
+    $ticket = EventTicket::factory()->create([
+        'event_id' => $this->event->id,
+        'name' => 'VIP Pass',
+        'tier' => 'vip',
+        'price' => 150000,
+    ]);
+
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'event_ticket_id' => $ticket->id,
+        'ticket_name' => $ticket->name,
+        'ticket_tier' => $ticket->tier,
+        'price' => $ticket->price,
+        'quantity' => 1,
+    ]);
+
+    $response = $this->get(route('orders.pdf', $order->order_number));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Type', 'application/pdf');
+    $response->assertHeader('Content-Disposition', 'attachment; filename=tiket-'.$order->order_number.'.pdf');
+});
+
+it('prevents pdf download for unpaid order', function () {
+    $order = Order::factory()->create([
+        'event_id' => $this->event->id,
+        'status' => 'pending',
+    ]);
+
+    $this->get(route('orders.pdf', $order->order_number))->assertStatus(403);
+});

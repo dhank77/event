@@ -8,6 +8,7 @@ import {
     CreditCard,
     Download,
     ExternalLink,
+    FileText,
     QrCode,
     Receipt,
     Ticket,
@@ -171,12 +172,28 @@ export default function OrderShow({ order }: OrderShowProps) {
                                     </div>
                                     <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                                         <a
-                                            href={order.qr_code}
-                                            download={`tiket-${order.order_number}.svg`}
+                                            href={`/orders/${order.order_number}/pdf`}
+                                            download={`tiket-${order.order_number}.pdf`}
                                         >
-                                            <Button variant="outline" size="sm" className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] hover:shadow-none transition-all">
+                                            <Button
+                                                size="sm"
+                                                className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] hover:shadow-none transition-all"
+                                            >
+                                                <FileText className="mr-1.5 size-3.5" />
+                                                Unduh E-Ticket (PDF)
+                                            </Button>
+                                        </a>
+                                        <a
+                                            href={`/orders/${order.order_number}/qrcode`}
+                                            download={`qrcode-${order.order_number}.png`}
+                                        >
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] hover:shadow-none transition-all"
+                                            >
                                                 <Download className="mr-1.5 size-3.5" />
-                                                Unduh QR Code
+                                                Unduh QR Code (PNG)
                                             </Button>
                                         </a>
                                     </div>
@@ -284,6 +301,14 @@ export default function OrderShow({ order }: OrderShowProps) {
                                         <Button className="w-full font-mono font-bold shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)]" size="lg">
                                             <ExternalLink className="mr-2 size-4" />
                                             Lanjutkan Pembayaran
+                                        </Button>
+                                    </a>
+                                )}
+                                {order.status === 'paid' && (
+                                    <a href={`/orders/${order.order_number}/pdf`} className="w-full">
+                                        <Button className="w-full font-mono font-bold shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)]" size="lg">
+                                            <FileText className="mr-2 size-4" />
+                                            Unduh E-Ticket (PDF)
                                         </Button>
                                     </a>
                                 )}

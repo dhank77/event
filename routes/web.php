@@ -23,6 +23,8 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->
 // Checkout & Order routes
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{orderNumber}', [CheckoutController::class, 'show'])->name('orders.show');
+Route::get('/orders/{orderNumber}/qrcode', [CheckoutController::class, 'downloadQrCode'])->name('orders.qrcode');
+Route::get('/orders/{orderNumber}/pdf', [CheckoutController::class, 'downloadPdf'])->name('orders.pdf');
 
 // Vendor profile and public event page — must be last to avoid catching other routes
 Route::get('{user:username}/events/{event:slug}', [PublicEventController::class, 'show'])->name('events.show');

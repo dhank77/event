@@ -67,6 +67,12 @@ class Event extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /** @return BelongsTo<User, $this> */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     /** @return HasMany<EventAgenda, $this> */
     public function agendas(): HasMany
     {
