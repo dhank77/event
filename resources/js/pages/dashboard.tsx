@@ -85,7 +85,14 @@ export default function Dashboard({
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--card)',
+                                            borderColor: 'var(--border)',
+                                            color: 'var(--card-foreground)',
+                                            borderRadius: '0.5rem',
+                                        }}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -113,7 +120,14 @@ export default function Dashboard({
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--card)',
+                                            borderColor: 'var(--border)',
+                                            color: 'var(--card-foreground)',
+                                            borderRadius: '0.5rem',
+                                        }}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -133,9 +147,17 @@ export default function Dashboard({
                                 <YAxis allowDecimals={false} className="text-xs" />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: 'hsl(var(--card))',
-                                        borderColor: 'hsl(var(--border))',
+                                        backgroundColor: 'var(--card)',
+                                        borderColor: 'var(--border)',
+                                        color: 'var(--card-foreground)',
                                         borderRadius: '0.5rem',
+                                    }}
+                                    itemStyle={{
+                                        color: 'var(--foreground)',
+                                    }}
+                                    labelStyle={{
+                                        color: 'var(--foreground)',
+                                        fontWeight: 600,
                                     }}
                                 />
                                 <Legend />

@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
@@ -9,6 +10,9 @@ export default function AuthSimpleLayout({
 }: AuthLayoutProps) {
     return (
         <div className="relative flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+            <div className="absolute top-4 right-4 z-20">
+                <ThemeToggle />
+            </div>
             {/* Dot pattern background */}
             <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{
                 backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',

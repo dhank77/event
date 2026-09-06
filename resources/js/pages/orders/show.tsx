@@ -140,7 +140,7 @@ export default function OrderShow({ order }: OrderShowProps) {
 
                         {/* QR CODE / E-TICKET (ONLY FOR PAID ORDERS) */}
                         {order.status === 'paid' && order.qr_code && (
-                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000] bg-card overflow-hidden">
+                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.15)] bg-card overflow-hidden">
                                 <CardHeader className="border-b-2 border-foreground bg-primary/10 pb-4 text-center">
                                     <div className="flex items-center justify-center gap-2 font-mono font-bold text-sm">
                                         <QrCode className="size-4 text-primary" />
@@ -151,7 +151,7 @@ export default function OrderShow({ order }: OrderShowProps) {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex flex-col items-center justify-center py-8">
-                                    <div className="rounded-xl border-2 border-foreground p-4 bg-white shadow-[4px_4px_0_0_#000]">
+                                    <div className="rounded-xl border-2 border-foreground p-4 bg-white shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.15)]">
                                         <img
                                             src={order.qr_code}
                                             alt={`QR Code ${order.order_number}`}
@@ -174,7 +174,7 @@ export default function OrderShow({ order }: OrderShowProps) {
                                             href={order.qr_code}
                                             download={`tiket-${order.order_number}.svg`}
                                         >
-                                            <Button variant="outline" size="sm" className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] hover:shadow-none transition-all">
+                                            <Button variant="outline" size="sm" className="font-mono text-xs border-2 border-foreground shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] hover:shadow-none transition-all">
                                                 <Download className="mr-1.5 size-3.5" />
                                                 Unduh QR Code
                                             </Button>
@@ -185,7 +185,7 @@ export default function OrderShow({ order }: OrderShowProps) {
                         )}
 
                         {/* ORDER DETAIL CARD */}
-                        <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000]">
+                        <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.15)]">
                             <CardHeader className="border-b-2 border-foreground bg-muted/40 pb-4">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ export default function OrderShow({ order }: OrderShowProps) {
                             <CardFooter className="flex flex-col gap-3 border-t-2 border-foreground/20 pt-4">
                                 {order.status === 'pending' && order.snap_redirect_url && (
                                     <a href={order.snap_redirect_url} className="w-full">
-                                        <Button className="w-full font-mono font-bold shadow-[2px_2px_0_0_#000]" size="lg">
+                                        <Button className="w-full font-mono font-bold shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)]" size="lg">
                                             <ExternalLink className="mr-2 size-4" />
                                             Lanjutkan Pembayaran
                                         </Button>

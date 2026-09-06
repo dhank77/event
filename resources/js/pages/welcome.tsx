@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ThemeToggle } from '@/components/theme-toggle';
 import {
     CalendarDays,
     CheckCircle2,
@@ -214,6 +215,7 @@ export default function Welcome() {
 
                         {/* Desktop CTA */}
                         <div className="hidden items-center gap-3 md:flex">
+                            <ThemeToggle />
                             {auth.user ? (
                                 <Button asChild>
                                     <Link href={dashboard()}>Dashboard</Link>
@@ -234,44 +236,47 @@ export default function Welcome() {
                         </div>
 
                         {/* Mobile Menu */}
-                        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                            <SheetTrigger asChild>
-                                <Button variant="outline" size="icon" className="md:hidden">
-                                    <Menu />
-                                    <span className="sr-only">Menu</span>
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="right" className="w-[280px]">
-                                <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
-                                <div className="flex flex-col gap-4 pt-8">
-                                    {NAV_LINKS.map((link) => (
-                                        <a
-                                            key={link.href}
-                                            href={link.href}
-                                            className="border-b border-border px-2 pb-3 text-lg font-medium"
-                                            onClick={() => setMobileMenuOpen(false)}
-                                        >
-                                            {link.label}
-                                        </a>
-                                    ))}
-                                    <Separator />
-                                    {auth.user ? (
-                                        <Button asChild className="w-full">
-                                            <Link href={dashboard()}>Dashboard</Link>
-                                        </Button>
-                                    ) : (
-                                        <div className="flex flex-col gap-2">
-                                            <Button variant="outline" asChild className="w-full">
-                                                <Link href={login()}>Masuk</Link>
-                                            </Button>
+                        <div className="flex items-center gap-2 md:hidden">
+                            <ThemeToggle />
+                            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                                <SheetTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <Menu />
+                                        <span className="sr-only">Menu</span>
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="right" className="w-[280px]">
+                                    <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
+                                    <div className="flex flex-col gap-4 pt-8">
+                                        {NAV_LINKS.map((link) => (
+                                            <a
+                                                key={link.href}
+                                                href={link.href}
+                                                className="border-b border-border px-2 pb-3 text-lg font-medium"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                            >
+                                                {link.label}
+                                            </a>
+                                        ))}
+                                        <Separator />
+                                        {auth.user ? (
                                             <Button asChild className="w-full">
-                                                <Link href={register()}>Daftar Sekarang</Link>
+                                                <Link href={dashboard()}>Dashboard</Link>
                                             </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                                        ) : (
+                                            <div className="flex flex-col gap-2">
+                                                <Button variant="outline" asChild className="w-full">
+                                                    <Link href={login()}>Masuk</Link>
+                                                </Button>
+                                                <Button asChild className="w-full">
+                                                    <Link href={register()}>Daftar Sekarang</Link>
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
+                        </div>
                     </nav>
                 </header>
 

@@ -7,6 +7,7 @@ use App\Models\EventCoupon;
 use App\Models\EventTicket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,13 +42,15 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        $monthlyEvents = Event::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        $driver = DB::connection()->getDriverName();
+        $monthExpr = $driver === 'sqlite' ? "cast(strftime('%m', created_at) as integer)" : 'MONTH(created_at)';
+        $monthlyEvents = Event::selectRaw("{$monthExpr} as month, COUNT(*) as count")
             ->whereYear('created_at', now()->year)
             ->groupBy('month')
             ->orderBy('month')
             ->get()
             ->map(fn ($item) => [
-                'month' => now()->startOfYear()->addMonths($item->month - 1)->format('M'),
+                'month' => now()->startOfYear()->addMonths(((int) $item->month) - 1)->format('M'),
                 'count' => (int) $item->count,
             ])
             ->values()

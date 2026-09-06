@@ -30,6 +30,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/theme-toggle';
 import type { PageProps } from '@/types';
 
 type Vendor = {
@@ -49,6 +50,7 @@ type TicketItem = {
     sales_start?: string | null;
     sales_end?: string | null;
     sales_status?: 'available' | 'upcoming' | 'ended' | 'sold_out';
+    max_per_order?: number | null;
 };
 
 type AgendaItem = {
@@ -197,12 +199,15 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                             </div>
                             <span className="font-mono text-lg font-bold tracking-tight">acarainaja.id</span>
                         </Link>
-                        <Link href={`/${vendor.username}`}>
-                            <Button variant="outline" className="font-mono text-xs">
-                                <ChevronLeft data-icon="inline-start" className="size-4" />
-                                Profil Vendor
-                            </Button>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <Link href={`/${vendor.username}`}>
+                                <Button variant="outline" className="font-mono text-xs">
+                                    <ChevronLeft data-icon="inline-start" className="size-4" />
+                                    Profil Vendor
+                                </Button>
+                            </Link>
+                        </div>
                     </nav>
                 </header>
 
@@ -212,7 +217,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                         <div className="space-y-10 lg:space-y-12">
                             {/* HERO BANNER & TITLE */}
                             <section className="space-y-6">
-                                <div className="aspect-[21/9] w-full overflow-hidden rounded-xl border-2 border-foreground shadow-[4px_4px_0_0_#000]">
+                                <div className="aspect-[21/9] w-full overflow-hidden rounded-xl border-2 border-foreground shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.15)]">
                                     {event.banner ? (
                                         <img src={event.banner} alt={event.title} className="h-full w-full object-cover" />
                                     ) : (
@@ -245,7 +250,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                             </section>
 
                             {/* INFORMASI PELAKSANAAN */}
-                            <div className="grid gap-4 rounded-xl border-2 border-foreground bg-card p-5 shadow-[3px_3px_0_0_#000] sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-4 rounded-xl border-2 border-foreground bg-card p-5 shadow-[3px_3px_0_0_#000] dark:shadow-[3px_3px_0_0_rgba(255,255,255,0.15)] sm:grid-cols-2 lg:grid-cols-3">
                                 <div className="flex items-start gap-3">
                                     <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-accent">
                                         <CalendarDays className="size-5" />
@@ -329,7 +334,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                     <h2 className="font-mono text-2xl font-bold">Pembicara</h2>
                                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                         {event.speakers.map((speaker) => (
-                                            <Card key={speaker.id} className="border-2 border-foreground shadow-[2px_2px_0_0_#000]">
+                                            <Card key={speaker.id} className="border-2 border-foreground shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)]">
                                                 <CardContent className="flex flex-col items-center gap-4 p-6 text-center">
                                                     <div className="size-24 overflow-hidden rounded-full border-2 border-foreground bg-muted">
                                                         {speaker.avatar_url ? (
@@ -358,7 +363,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                     <h2 className="font-mono text-2xl font-bold">Rundown Acara</h2>
                                     <div className="space-y-4">
                                         {event.agendas.map((agenda) => (
-                                            <div key={agenda.id} className="flex gap-4 rounded-xl border-2 border-foreground bg-card p-4 shadow-[2px_2px_0_0_#000] sm:p-6">
+                                            <div key={agenda.id} className="flex gap-4 rounded-xl border-2 border-foreground bg-card p-4 shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] sm:p-6">
                                                 <div className="flex w-24 shrink-0 flex-col items-center justify-center rounded-lg border-2 border-foreground bg-accent py-2 font-mono text-sm font-bold sm:w-32 sm:text-base">
                                                     <Clock className="mb-1 size-4" />
                                                     {agenda.time}
@@ -391,7 +396,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                     <div className="flex flex-wrap justify-center gap-6">
                                         {event.sponsors.map((sponsor) => (
                                             <div key={sponsor.id} className="flex flex-col items-center gap-2">
-                                                <div className="flex h-20 w-40 items-center justify-center rounded-xl border-2 border-foreground bg-card p-4 shadow-[2px_2px_0_0_#000]">
+                                                <div className="flex h-20 w-40 items-center justify-center rounded-xl border-2 border-foreground bg-card p-4 shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)]">
                                                     {sponsor.logo_url ? (
                                                         <img src={sponsor.logo_url} alt={sponsor.name} className="max-h-full max-w-full object-contain grayscale transition-all hover:grayscale-0" />
                                                     ) : (
@@ -409,7 +414,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                         {/* ═══ SIDEBAR ═══ */}
                         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                             {/* TICKETS CARD (PRIMARY) */}
-                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000]">
+                            <Card className="border-2 border-foreground shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.15)]">
                                 <CardHeader className="bg-primary text-primary-foreground border-b-2 border-foreground pb-4">
                                     <div className="flex items-center gap-2">
                                         <Ticket className="size-5" />
@@ -521,7 +526,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
                                             </span>
                                         </div>
                                         <Button
-                                            className="w-full font-mono text-sm shadow-[2px_2px_0_0_#000] cursor-pointer"
+                                            className="w-full font-mono text-sm shadow-[2px_2px_0_0_#000] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.15)] cursor-pointer"
                                             size="lg"
                                             disabled={totalTickets === 0}
                                             onClick={() => setCheckoutOpen(true)}
@@ -538,7 +543,7 @@ export default function EventShow({ vendor, event }: EventShowProps) {
 
                 {/* ═══ CHECKOUT DIALOG ═══ */}
                 <Dialog open={checkoutOpen} onOpenChange={(open) => { if (!isSubmitting) setCheckoutOpen(open); }}>
-                    <DialogContent className="border-2 border-foreground shadow-[6px_6px_0_0_#000] sm:max-w-lg">
+                    <DialogContent className="border-2 border-foreground shadow-[6px_6px_0_0_#000] dark:shadow-[6px_6px_0_0_rgba(255,255,255,0.15)] sm:max-w-lg">
                         <DialogHeader>
                             <DialogTitle className="font-mono text-xl font-bold">
                                 Pemesanan Tiket
