@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\VendorProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +16,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/vendor.php';
 
-use App\Http\Controllers\PublicEventController;
+// Google OAuth
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 // Checkout & Order routes
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
