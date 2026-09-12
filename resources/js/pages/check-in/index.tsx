@@ -56,7 +56,7 @@ type ScannedOrder = {
     vendor_name?: string;
 };
 
-type ScanStatus = 'idle' | 'scanning' | 'success' | 'already_checked_in' | 'not_paid' | 'not_found' | 'forbidden' | 'error';
+type ScanStatus = 'idle' | 'scanning' | 'success' | 'already_checked_in' | 'wrong_event' | 'not_paid' | 'not_found' | 'forbidden' | 'error';
 
 type CheckInIndexProps = {
     events: EventOption[];
@@ -75,6 +75,7 @@ const STATUS_UI: Record<ScanStatus, { bg: string; border: string; icon: typeof C
     scanning: null,
     success: { bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-400', icon: CheckCircle2, label: 'Check-In Berhasil!' },
     already_checked_in: { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-400', icon: AlertTriangle, label: 'Sudah Check-In Sebelumnya' },
+    wrong_event: { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-400', icon: AlertTriangle, label: 'Event Tidak Sesuai' },
     not_paid: { bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-400', icon: XCircle, label: 'Belum Lunas' },
     not_found: { bg: 'bg-slate-50 dark:bg-slate-950/30', border: 'border-slate-400', icon: AlertCircle, label: 'Order Tidak Ditemukan' },
     forbidden: { bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-400', icon: XCircle, label: 'Akses Ditolak' },
@@ -125,7 +126,10 @@ export default function CheckInIndex({ events, is_admin }: CheckInIndexProps) {
                         Accept: 'application/json',
                         'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '',
                     },
-                    body: JSON.stringify({ order_number: trimmed }),
+                    body: JSON.stringify({
+                        order_number: trimmed,
+                        event_id: selectedEventId ? Number(selectedEventId) : null,
+                    }),
                 });
 
                 const data = await res.json();
@@ -148,7 +152,7 @@ export default function CheckInIndex({ events, is_admin }: CheckInIndexProps) {
                 setIsProcessing(false);
             }
         },
-        [isProcessing],
+        [isProcessing, selectedEventId],
     );
 
     /* ── Camera / QR Scanner ── */
@@ -566,6 +570,11 @@ function ResultCard({
                 <p className="text-xs text-muted-foreground">{message}</p>
             </CardHeader>
             <CardContent className="space-y-3">
+                {status === 'wrong_event' && (
+                    <div className="rounded-md border border-amber-300 bg-amber-100/70 p-2.5 text-xs font-medium text-amber-900 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+                        ⚠️ Tiket ini terdaftar untuk event <strong>"{order.event.title}"</strong>, bukan event yang sedang dipilih. Check-in tidak dapat diproses.
+                    </div>
+                )}
                 <div className="rounded-lg border bg-background/60 p-3 space-y-2">
                     <div className="flex items-center justify-between">
                         <span className="font-mono text-xs text-muted-foreground">#{order.order_number}</span>

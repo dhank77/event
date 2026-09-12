@@ -47,6 +47,7 @@ class CheckInController extends Controller
 
         $validated = $request->validate([
             'order_number' => ['required', 'string', 'max:50'],
+            'event_id' => ['nullable', 'integer', 'exists:events,id'],
         ]);
 
         $order = Order::with(['event.vendor', 'items'])
@@ -65,6 +66,14 @@ class CheckInController extends Controller
                 'status' => 'forbidden',
                 'message' => 'Anda tidak punya akses ke order ini.',
             ], 403);
+        }
+
+        if (! empty($validated['event_id']) && (int) $order->event_id !== (int) $validated['event_id']) {
+            return response()->json([
+                'status' => 'wrong_event',
+                'message' => 'Tiket ini terdaftar untuk event "'.$order->event->title.'", bukan event yang sedang dipilih.',
+                'order' => $this->formatOrder($order, $isAdmin),
+            ], 422);
         }
 
         if ($order->status !== 'paid') {

@@ -173,3 +173,28 @@ test('admin can check in any vendor\'s order', function () {
 
     expect($order->fresh()->checked_in_at)->not->toBeNull();
 });
+
+test('scan returns 422 when order belongs to a different event than selected', function () {
+    $vendor = User::factory()->create(['role' => 'vendor']);
+    $eventA = Event::factory()->create(['user_id' => $vendor->id, 'title' => 'Concert A']);
+    $eventB = Event::factory()->create(['user_id' => $vendor->id, 'title' => 'Concert B']);
+
+    $order = Order::factory()->paid()->create([
+        'event_id' => $eventA->id,
+        'checked_in_at' => null,
+    ]);
+
+    // Scanning with selected event B while ticket is for event A
+    $response = $this->actingAs($vendor)->postJson(route('check-in.scan'), [
+        'order_number' => $order->order_number,
+        'event_id' => $eventB->id,
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJson([
+            'status' => 'wrong_event',
+            'message' => 'Tiket ini terdaftar untuk event "Concert A", bukan event yang sedang dipilih.',
+        ]);
+
+    expect($order->fresh()->checked_in_at)->toBeNull();
+});
