@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, CalendarDays, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, CalendarDays, FolderGit2, LayoutGrid, ShoppingCart } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -14,6 +14,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as ordersIndex } from '@/routes/orders';
 import { index as vendorEventsIndex } from '@/routes/vendor/events';
 import type { NavItem, PageProps } from '@/types';
 
@@ -42,6 +43,14 @@ export function AppSidebar() {
     const { auth } = usePage<PageProps>().props;
 
     const mainNavItems: NavItem[] = [...baseNavItems];
+
+    if (auth.user.role === 'admin' || auth.user.role === 'vendor') {
+        mainNavItems.push({
+            title: 'Orders',
+            href: ordersIndex(),
+            icon: ShoppingCart,
+        });
+    }
 
     if (auth.user.role === 'vendor') {
         mainNavItems.push({
