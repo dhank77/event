@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -13,6 +14,8 @@ Route::inertia('/', 'welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('check-in', [CheckInController::class, 'index'])->name('check-in.index');
+    Route::post('check-in/scan', [CheckInController::class, 'scan'])->name('check-in.scan');
 });
 
 require __DIR__.'/settings.php';

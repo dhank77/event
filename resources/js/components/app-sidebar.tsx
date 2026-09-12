@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, CalendarDays, FolderGit2, LayoutGrid, ShoppingCart } from 'lucide-react';
+import { BookOpen, CalendarDays, FolderGit2, LayoutGrid, ScanLine, ShoppingCart } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -14,6 +14,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as checkInIndex } from '@/routes/check-in';
 import { index as ordersIndex } from '@/routes/orders';
 import { index as vendorEventsIndex } from '@/routes/vendor/events';
 import type { NavItem, PageProps } from '@/types';
@@ -26,18 +27,7 @@ const baseNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { auth } = usePage<PageProps>().props;
@@ -49,6 +39,11 @@ export function AppSidebar() {
             title: 'Orders',
             href: ordersIndex(),
             icon: ShoppingCart,
+        });
+        mainNavItems.push({
+            title: 'Check-In',
+            href: checkInIndex(),
+            icon: ScanLine,
         });
     }
 

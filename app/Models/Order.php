@@ -24,11 +24,12 @@ use Illuminate\Support\Carbon;
  * @property string|null $payment_type
  * @property Carbon|null $wa_pending_sent_at
  * @property Carbon|null $wa_paid_sent_at
+ * @property Carbon|null $checked_in_at
  */
 #[Fillable([
     'order_number', 'event_id', 'user_id', 'buyer_name', 'buyer_email',
     'buyer_phone', 'total_price', 'status', 'snap_token', 'snap_redirect_url', 'payment_type',
-    'wa_pending_sent_at', 'wa_paid_sent_at',
+    'wa_pending_sent_at', 'wa_paid_sent_at', 'checked_in_at',
 ])]
 class Order extends Model
 {
@@ -40,6 +41,7 @@ class Order extends Model
             'total_price' => 'integer',
             'wa_pending_sent_at' => 'datetime',
             'wa_paid_sent_at' => 'datetime',
+            'checked_in_at' => 'datetime',
         ];
     }
 
