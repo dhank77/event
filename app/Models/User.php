@@ -52,6 +52,12 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Event::class);
     }
 
+    /** @return HasMany<Withdrawal, $this> */
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
     protected function casts(): array
     {
         return [

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, CalendarDays, FolderGit2, LayoutGrid, ScanLine, ShoppingCart } from 'lucide-react';
+import { BookOpen, CalendarDays, FolderGit2, LayoutGrid, ScanLine, ShoppingCart, Wallet } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -17,6 +17,7 @@ import { dashboard } from '@/routes';
 import { index as checkInIndex } from '@/routes/check-in';
 import { index as ordersIndex } from '@/routes/orders';
 import { index as vendorEventsIndex } from '@/routes/vendor/events';
+import { index as vendorWithdrawalsIndex } from '@/routes/vendor/withdrawals';
 import type { NavItem, PageProps } from '@/types';
 
 const baseNavItems: NavItem[] = [
@@ -44,6 +45,11 @@ export function AppSidebar() {
             title: 'Check-In',
             href: checkInIndex(),
             icon: ScanLine,
+        });
+        mainNavItems.push({
+            title: 'Tarik Saldo',
+            href: vendorWithdrawalsIndex(),
+            icon: Wallet,
         });
     }
 
