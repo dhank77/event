@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboard } from '@/routes';
-import { BarChart3, CalendarDays, Ticket, Users, TicketPercent } from 'lucide-react';
+import { BarChart3, BadgeCheck, CalendarDays, Ticket, Users, TicketPercent } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -12,16 +12,26 @@ type StatItem = {
     value: string | number;
 };
 
+type AdminStats = {
+    totalEvents: number;
+    totalTickets: number;
+    totalCoupons: number;
+    totalVendors: number;
+};
+
+type VendorStats = {
+    totalEvents: number;
+    totalTickets: number;
+    totalCoupons: number;
+    totalPaidOrders: number;
+};
+
 type DashboardProps = {
-    stats: {
-        totalEvents: number;
-        totalTickets: number;
-        totalCoupons: number;
-        totalVendors: number;
-    };
+    stats: AdminStats | VendorStats;
     eventsByStatus: { name: string; value: number }[];
     eventsByType: { name: string; value: number }[];
     monthlyEvents: { month: string; count: number }[];
+    is_admin: boolean;
 };
 
 export default function Dashboard({
@@ -29,13 +39,21 @@ export default function Dashboard({
     eventsByStatus,
     eventsByType,
     monthlyEvents,
+    is_admin,
 }: DashboardProps) {
-    const statCards: StatItem[] = [
-        { icon: CalendarDays, label: 'Total Event', value: stats.totalEvents },
-        { icon: Ticket, label: 'Total Tiket', value: stats.totalTickets },
-        { icon: TicketPercent, label: 'Total Kupon', value: stats.totalCoupons },
-        { icon: Users, label: 'Total Vendor', value: stats.totalVendors },
-    ];
+    const statCards: StatItem[] = is_admin
+        ? [
+            { icon: CalendarDays, label: 'Total Event', value: (stats as AdminStats).totalEvents },
+            { icon: Ticket, label: 'Total Tiket', value: (stats as AdminStats).totalTickets },
+            { icon: TicketPercent, label: 'Total Kupon', value: (stats as AdminStats).totalCoupons },
+            { icon: Users, label: 'Total Vendor', value: (stats as AdminStats).totalVendors },
+          ]
+        : [
+            { icon: CalendarDays, label: 'Event Saya', value: (stats as VendorStats).totalEvents },
+            { icon: Ticket, label: 'Total Tiket', value: (stats as VendorStats).totalTickets },
+            { icon: TicketPercent, label: 'Total Kupon', value: (stats as VendorStats).totalCoupons },
+            { icon: BadgeCheck, label: 'Order Lunas', value: (stats as VendorStats).totalPaidOrders },
+          ];
 
     return (
         <>
@@ -44,7 +62,9 @@ export default function Dashboard({
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-muted-foreground text-sm">Ringkasan aktivitas event Anda</p>
+                        <p className="text-muted-foreground text-sm">
+                            {is_admin ? 'Ringkasan aktivitas seluruh event & vendor' : 'Ringkasan aktivitas event Anda'}
+                        </p>
                     </div>
                 </div>
 
